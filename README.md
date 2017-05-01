@@ -5,4 +5,7 @@ I've been looking into using multicast for collectd but need a way to test that 
 Information about [Multicast addresses](https://en.wikipedia.org/wiki/Multicast_address)
 Example [Python code for Multicast](https://pymotw.com/2/socket/multicast.html)
 
+## References
 
+* [argparse](https://docs.python.org/2/library/argparse.html)
+* [multicast sockets](https://pymotw.com/2/socket/multicast.html)
