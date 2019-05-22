@@ -33,13 +33,18 @@ def createClientSocket(address, port, ttl):
 
 
 def createServerSocket(address, port, receiveTimeout):
-    addressAsInt = socket.inet_aton(address)
-    addressAsStruct = struct.pack('4sL', addressAsInt, socket.INADDR_ANY)
+    #portAsInt = socket.htons(port)
+    #addressAsInt = socket.htonl(socket.INADDR_ANY)
+    #addressStruct = struct.pack('IHI', socket.AF_INET, portAsInt, addressAsInt)
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    serverSocket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, addressAsStruct)
+    serverSocket.bind(('0.0.0.0', port))
+    
+    groupAsAddress = socket.inet_aton(address)
+    groupStruct = struct.pack('4sI', groupAsAddress, socket.htonl(socket.INADDR_ANY))
+    
+    serverSocket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, groupStruct)
     serverSocket.settimeout(receiveTimeout)
-    serverSocket.bind('', port)
     return serverSocket
 
 
@@ -75,11 +80,11 @@ def clientSendLoop(clientSocket):
 arguments = parseArguments()
 
 if arguments.client and arguments.server:
-    print >>sys.stderr,  'Make your mind up, client OR server'
+    print('Make your mind up, client OR server')
     exit(1)
 
 if arguments.client == arguments.server:
-    print >>sys.stderr,  'You need to pick one, client OR server'
+    print('You need to pick one, client OR server')
     exit(1)
 
 if arguments.client:
@@ -89,6 +94,6 @@ if arguments.client:
 
 if arguments.server:
     serverSocket = createServerSocket(arguments.address, arguments.port,arguments.wait)
-    serverRecieveLoop(serverSocket)
+    serverReceiveLoop(serverSocket)
     exit(0)
 
