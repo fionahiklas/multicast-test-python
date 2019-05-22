@@ -5,6 +5,7 @@ import argparse
 import socket
 import struct
 import sys
+import datetime
 
 
 def parseArguments():
@@ -46,16 +47,25 @@ def serverReceiveLoop(serverSocket):
     while True:
         try:
             data, clientAddress = serverSocket.recvfrom(100)
+            print('Client: "', clientAddress, '" sent data: "', data)
         except socket.timeout:
-            print >>sys.stderr, 'Timed out waiting for data'
+            print('Timed out waiting for data')
             continue
         except Exception as ex:
-            print >>sys.stderr, 'Received exception %s' % ex
+            print('Received exception: ', ex)
             break
 
 
 def clientSendLoop(clientSocket):
     while True:
+        try:
+            currentDateTime = datetime.datetime.now()
+            clientSocket.send('Hello from the client at: ', currentDateTime)
+            sleep(1000)
+        except Exception as ex:
+            print('Received exception: ', ex)
+            continue
+            
 
 
 # ########### #
@@ -67,4 +77,18 @@ arguments = parseArguments()
 if arguments.client and arguments.server:
     print >>sys.stderr,  'Make your mind up, client OR server'
     exit(1)
+
+if arguments.client == arguments.server:
+    print >>sys.stderr,  'You need to pick one, client OR server'
+    exit(1)
+
+if arguments.client:
+    clientSocket = createClientSocket(arguments.address, arguments.port, arguments.ttl)
+    clientSendLoop(clientSocket)
+    exit(0)
+
+if arguments.server:
+    serverSocket = createServerSocket(arguments.address, arguments.port,arguments.wait)
+    serverRecieveLoop(serverSocket)
+    exit(0)
 
