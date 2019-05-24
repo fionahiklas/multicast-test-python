@@ -92,4 +92,5 @@ ENV/
 *.iml
 .idea
 
-
+# Backup files
+*~

@@ -6,6 +6,10 @@ import socket
 import struct
 import sys
 import datetime
+import time
+
+# Constant for the address/interface to bind/connect to
+ALL_ADDR = '0.0.0.0'
 
 
 def parseArguments():
@@ -23,8 +27,9 @@ def parseArguments():
 
 
 def createClientSocket(address, port, ttl):
+    print('Creating client socket, group: ', address, ' port: ', port, ' ttl: ', ttl)
     addressAndPort = (address, port)
-    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
     ttl = struct.pack('b', ttl)
     clientSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
@@ -33,25 +38,38 @@ def createClientSocket(address, port, ttl):
 
 
 def createServerSocket(address, port, receiveTimeout):
-    #portAsInt = socket.htons(port)
-    #addressAsInt = socket.htonl(socket.INADDR_ANY)
-    #addressStruct = struct.pack('IHI', socket.AF_INET, portAsInt, addressAsInt)
+    print('Creating server socket, group: ', address, ' port: ', port, ' timeout: ', receiveTimeout)
+    
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    serverSocket.bind(('0.0.0.0', port))
+    ttl = struct.pack('b', ttl)
+    clientSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+    clientSocket.connect(addressAndPort)
+    return clientSocket
+
+
+def createServerSocket(address, port, receiveTimeout):
+    print('Creating server socket, group: ', address, ' port: ', port, ' timeout: ', receiveTimeout)
     
-    groupAsAddress = socket.inet_aton(address)
-    groupStruct = struct.pack('4sI', groupAsAddress, socket.htonl(socket.INADDR_ANY))
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    serverSocket.bind(('', port))
     
+    groupAddress = socket.inet_aton(address)
+    anyAddress = socket.inet_aton(ALL_ADDR)
+    groupStruct = struct.pack('4s4s', groupAddress, anyAddress)
+    print('Created group struct: ', groupStruct)
+
+    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     serverSocket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, groupStruct)
     serverSocket.settimeout(receiveTimeout)
+    
     return serverSocket
 
 
 def serverReceiveLoop(serverSocket):
     while True:
         try:
-            data, clientAddress = serverSocket.recvfrom(100)
+            data, clientAddress = serverSocket.recvfrom(1024)
             print('Client: "', clientAddress, '" sent data: "', data)
         except socket.timeout:
             print('Timed out waiting for data')
@@ -65,8 +83,11 @@ def clientSendLoop(clientSocket):
     while True:
         try:
             currentDateTime = datetime.datetime.now()
-            clientSocket.send('Hello from the client at: ', currentDateTime)
-            sleep(1000)
+            messageAsString = 'Hello from the client at: %s' % currentDateTime
+            print('Sending this message: ', messageAsString)
+            clientSocket.send(bytearray(messageAsString,'UTF8'))
+            time.sleep(1)
+            
         except Exception as ex:
             print('Received exception: ', ex)
             continue
