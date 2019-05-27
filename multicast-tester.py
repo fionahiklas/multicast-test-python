@@ -41,25 +41,13 @@ def createServerSocket(address, port, receiveTimeout):
     print('Creating server socket, group: ', address, ' port: ', port, ' timeout: ', receiveTimeout)
     
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-
-    ttl = struct.pack('b', ttl)
-    clientSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
-    clientSocket.connect(addressAndPort)
-    return clientSocket
-
-
-def createServerSocket(address, port, receiveTimeout):
-    print('Creating server socket, group: ', address, ' port: ', port, ' timeout: ', receiveTimeout)
-    
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    serverSocket.bind(('', port))
+    serverSocket.bind((ALL_ADDR, port))
     
     groupAddress = socket.inet_aton(address)
     anyAddress = socket.inet_aton(ALL_ADDR)
     groupStruct = struct.pack('4s4s', groupAddress, anyAddress)
     print('Created group struct: ', groupStruct)
 
-    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     serverSocket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, groupStruct)
     serverSocket.settimeout(receiveTimeout)
     

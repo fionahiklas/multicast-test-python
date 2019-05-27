@@ -5,6 +5,40 @@ I've been looking into using multicast for collectd but need a way to test that 
 Information about [Multicast addresses](https://en.wikipedia.org/wiki/Multicast_address)
 Example [Python code for Multicast](https://pymotw.com/2/socket/multicast.html)
 
+
+## Quickstart
+
+Run the server (receiver) using the following command
+
+```
+/usr/local/bin/python3 multicast-tester.py -s -p 7654 -a 239.0.0.1 -w 10
+```
+
+Run the client (sender) using the following command
+
+```
+/usr/local/bin/python3 multicast-tester.py -c -p 7654 -a 239.0.0.1 -t 10
+```
+
+
+
+## C Example Code
+
+I took the C example code from the link below as I was having lots of hassle 
+getting the Python to work on MacOS
+
+I'm not 100% sure what fixed it but suspect that `bind('', ...)` might not have 
+worked but `bind('0.0.0.0', ...)` does.
+
+Anyway, to sanity-check the Multicast networking I compiled the C code as 
+follows
+
+```
+gcc -o multicast.app multicast.c
+```
+
+
+
 ## References
 
 * [argparse](https://docs.python.org/2/library/argparse.html)

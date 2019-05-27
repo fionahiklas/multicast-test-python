@@ -94,3 +94,6 @@ ENV/
 
 # Backup files
 *~
+
+# Executables
+*.app
