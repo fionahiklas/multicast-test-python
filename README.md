@@ -47,3 +47,11 @@ gcc -o multicast.app multicast.c
 * [Python socket programming](https://realpython.com/python-sockets/)
 * [Python struct module](https://docs.python.org/3/library/struct.html#module-struct)
 * [Multicast bind](https://stackoverflow.com/questions/10692956/what-does-it-mean-to-bind-a-multicast-udp-socket/29526884)
+* [Multicast addressing](https://en.wikipedia.org/wiki/Multicast_address)
+* [Connect for UDP sockets](https://erlerobotics.gitbooks.io/erle-robotics-python-gitbook-free/udp_and_tcp/connecting_udp_sockets.html)
+* APIs
+ * [inet_aton](https://linux.die.net/man/3/inet_aton)
+ * [Linux socket headers](http://man7.org/linux/man-pages/man7/ip.7.html)
+ * [Python struct formatting](https://docs.python.org/3/library/struct.html#module-struct)
+ * [Python low-level sockets](https://docs.python.org/3/library/socket.html)
+* [Finding include paths](https://stackoverflow.com/questions/6715454/what-is-the-default-path-for-osx-system-include-files-when-building-a-c-applic)
